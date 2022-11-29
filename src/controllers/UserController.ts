@@ -22,7 +22,7 @@ export class UserController{
         const newUser = userRepository.create({email,password})
         await userRepository.save(newUser)
 
-        return res.json(newUser)
+        return res.status(201).json(newUser)
     }
 
 

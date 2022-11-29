@@ -1,0 +1,290 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "TypeScript-NodeJS-CRUD-REST-API-Redis-Postgree-Jwt-typeorm",
+    "description": "Crud de catálogo de filmes com cache em Redis e autenticação Jwt",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Root from Local Dev, or hosting service"
+    }
+  ],
+  "paths": {
+    "/user": {
+      "post": {
+        "summary": "Create a new user.",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Returns your account information after successfully creating.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "email": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The specified user email is already in use."
+          }
+        }
+      }
+    },
+    "/auth": {
+      "post": {
+        "summary": "Generate auth token.",
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns your auth token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "authorization": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not Authorized."
+          }
+        }
+      }
+    },
+    "/movie": {
+      "get": {
+        "summary": "List All Movies in the catalog (Cached after the first request).",
+        "tags": [
+          "Movie"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns all movies in json."
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new movie to the catalog.",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "genre",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "urlPoster",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "Movie (Private)"
+        ],
+        "responses": {
+          "201": {
+            "description": "Add a new movie to the catalog."
+          },
+          "401": {
+            "description": "Not Authorized."
+          }
+        }
+      }
+    },
+    "/clearcache": {
+      "get": {
+        "summary": "Clears the cached movie list.",
+        "tags": [
+          "Movie"
+        ],
+        "responses": {
+          "200": {
+            "description": "Cache cleared."
+          }
+        }
+      }
+    },
+    "/movie/{id}": {
+      "get": {
+        "summary": "Search for Movies in the catalog.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Use the Id OR partial title of the movie to return one."
+          }
+        ],
+        "tags": [
+          "Movie"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the movie in json."
+          },
+          "404": {
+            "description": "Movie not Found."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a Movie in the catalog.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Use the Id of the movie to delete."
+          }
+        ],
+        "tags": [
+          "Movie (Private)"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the confirmation."
+          },
+          "401": {
+            "description": "Unauthorized."
+          },
+          "404": {
+            "description": "Movie not Found."
+          }
+        }
+      },
+      "put": {
+        "summary": "Edit movie from the catalog.",
+        "description": "Update all 3 fields at once, or one each time.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "genre",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "urlPoster",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "tags": [
+          "Movie (Private)"
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated."
+          },
+          "401": {
+            "description": "Not Authorized."
+          },
+          "404": {
+            "description": "Movie not Found."
+          }
+        }
+      }
+    }
+  }
+}
