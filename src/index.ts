@@ -1,11 +1,17 @@
 import express from 'express';
+import { AppDataSource } from './data-source';
+import routes from './routes';
 
-const app = express();
+AppDataSource.initialize().then(() => {
 
-app.get("/", (req, res) => {res.send("Tis Worken")});
-/* app.get('/',(req, res) =>{
-    res.send("Funfando");
-}) */
-app.listen(3001,()=> {
-    console.log("rodando ")
-});
+    const app = express();
+
+    app.use(express.json())
+    app.use(routes)
+    return app.listen(3001)
+
+
+})
+
+
+
