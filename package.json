@@ -2,7 +2,7 @@
 
   "scripts": {
 
-    "dev": "nodemon --exec ts-node ./src/index.ts",
+    "dev": "nodemon --exec --files ts-node ./src/index.ts",
 
     "build": "tsc",
 
@@ -45,6 +45,8 @@
   "devDependencies": {
 
     "@types/bcryptjs": "^2.4.2",
+
+    "@types/jsonwebtoken": "^8.5.9",
 
     "ts-node-dev": "^2.0.0"
 
