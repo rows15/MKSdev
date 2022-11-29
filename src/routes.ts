@@ -9,10 +9,10 @@ routes.post('/user',new UserController().create)
 routes.post('/auth',new AuthController().auth)
 
 routes.get('/movie', new MovieController().list)
-routes.put('/movie/:id/update', new MovieController().update)
+routes.put('/movie/:id/update', authMiddleware, new MovieController().update)
 routes.get('/movie/:id', authMiddleware, new MovieController().search)
-routes.post('/movie', new MovieController().create)
-routes.delete('/movie/:id', new MovieController().delete)
+routes.post('/movie', authMiddleware, new MovieController().create)
+routes.delete('/movie/:id', authMiddleware, new MovieController().delete)
 
 routes.get('/clearcache', new MovieController().clearCache)
 
