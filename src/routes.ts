@@ -9,6 +9,8 @@ routes.get('/movie/:id', new MovieController().search)
 routes.post('/movie', new MovieController().create)
 routes.delete('/movie/:id', new MovieController().delete)
 
+routes.get('/clearcache', new MovieController().clearCache)
+
 
 
 

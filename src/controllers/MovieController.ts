@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { title } from "process";
 import { ILike, Like } from "typeorm";
+import redis from "../lib/cache";
 import { movieRepository } from "../repositories/MovieRepository";
 
 export class MovieController{
@@ -97,7 +98,18 @@ export class MovieController{
         
         
         try{
-            
+            console.time("Get Movies")
+            const cacheKey = "movies:all"
+
+            const cachedMovies = await redis.get(cacheKey)            
+
+            if(cachedMovies) {
+                console.timeEnd("Get Movies")
+                console.log("cached")
+                return res.status(200).json(JSON.parse(cachedMovies))
+            }
+
+
             const allMovies = await movieRepository.find({select:{
                                                             id: true,
                                                             title: true,
@@ -111,6 +123,9 @@ export class MovieController{
             }
             console.log("Listei Todos")
             console.log(allMovies)
+            console.timeEnd("Get Movies")
+            console.log("uncached")
+            await redis.set(cacheKey, JSON.stringify(allMovies))
             return res.status(200).json(allMovies)
             
 
@@ -153,5 +168,21 @@ export class MovieController{
         }
     }
     
+    async clearCache(req: Request, res: Response){
+        
+        
+        try{
+            await redis.del("movies:all")
+            
+            res.json({
+                ok: true
+            })
+            console.log("deletei")
+        } catch(error){
+            console.log(error)
+            return res.status(500).json({message:"Internal server error"})
+
+        }
+    }
 
 }
